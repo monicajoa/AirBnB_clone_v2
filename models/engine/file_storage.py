@@ -8,9 +8,16 @@ class FileStorage:
     __file_path = 'file.json'
     __objects = {}
 
-    def all(self):
-        """Returns a dictionary of models currently in storage"""
-        return FileStorage.__objects
+    def all(self, cls=None):
+        """Returns the list of objects of one type of class"""
+        if cls == None:
+            return FileStorage.__objects
+        else:
+            new_dic = {}
+            for key, value in FileStorage.__objects.items():
+                if type(value) == cls:
+                    new_dic[key] = value
+            return new_dic
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -36,15 +43,26 @@ class FileStorage:
         from models.review import Review
 
         classes = {
-                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
-                    'State': State, 'City': City, 'Amenity': Amenity,
-                    'Review': Review
-                  }
+            'BaseModel': BaseModel, 'User': User, 'Place': Place,
+            'State': State, 'City': City, 'Amenity': Amenity,
+            'Review': Review
+        }
         try:
             temp = {}
             with open(FileStorage.__file_path, 'r') as f:
                 temp = json.load(f)
                 for key, val in temp.items():
-                        self.all()[key] = classes[val['__class__']](**val)
+                    self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
+
+    def delete(self, obj=None):
+        """Public instance method to delete obj from objects if it’s inside
+
+        Args:
+            obj ([objet], optional): [object from BaseModel class] Defaults to None
+        """
+        if obj:
+            str_aux = "{}.{}".format(type(obj).__name__, obj.id)
+            if str_aux in self.all():
+                self.all().pop(str_aux)
