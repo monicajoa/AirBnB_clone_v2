@@ -10,6 +10,7 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+import re
 
 
 class HBNBCommand(cmd.Cmd):
@@ -113,53 +114,40 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    @staticmethod
-    def args_manager(args):
-        """Static method that review the args
-        from create to update the instance
-        Args:
-            args ([str]): Args input to created method
-
-        Returns:
-            [str, dic]: Classname and dictionary with attributes
-        """
-        args = args.split()
-        temp_class = args.pop(0)
-        args_dic = {}
-        for arg in args:
-            key, value = arg.split("=")
-            if value[0] == '"' and value[-1] == '"':
-                aux_value = value[1:-1]
-                for index in range(len(aux_value)):
-                    if aux_value[index] == '"' and aux_value[index - 1] != "\\":
-                        aux_value.replace('"', '\\"')
-                    elif aux_value[index] == '_':
-                        aux_value.replace('_', ' ')
-                args_dic[key] = aux_value
-            else:
-                try:
-                    args_dic[key] = int(value)
-                except:
-                    try:
-                        args_dic[key] = float(value)
-                    except:
-                        pass
-        return temp_class, args_dic
-
     def do_create(self, args):
         """ Create an object of any class"""
         if not args:
             print("** class name missing **")
             return
-        args, args_dic = self.args_manager(args)
-        if args not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-        new_instance = HBNBCommand.classes[args]()
-        new_instance.__dict__.update(args_dic)
-        storage.save()
-        print(new_instance.id)
-        storage.save()
+        else:
+            args = args.split(" ")
+            if args[0] not in HBNBCommand.classes:
+                print("** class doesn't exist **")
+                return
+            ins = HBNBCommand.classes[args[0]]()
+            for i in range(1, len(args)):
+                match = re.search('^(\S+)\=(\S+)', args[i])
+                if not match:
+                    continue
+                key = match.group(1)
+                value = match.group(2)
+                if re.search('^".*"$', value):
+                    value = value.replace('"', '')
+                    value = value.replace("_", " ")
+                else:
+                    if '.' in value:
+                        try:
+                            value = float(value)
+                        except ValueError:
+                            pass
+                    else:
+                        try:
+                            value = int(value)
+                        except ValueError:
+                            pass
+                setattr(ins, key, value)
+            ins.save()
+            print("{}".format(ins.id))
 
     def help_create(self):
         """ Help information for the create method """
