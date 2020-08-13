@@ -126,7 +126,7 @@ class HBNBCommand(cmd.Cmd):
                 return
             ins = HBNBCommand.classes[args[0]]()
             for i in range(1, len(args)):
-                match = re.search('^(\S+)\=(\S+)', args[i])
+                match = re.search(r'^(\S+)\=(\S+)', args[i])
                 if not match:
                     continue
                 key = match.group(1)
@@ -229,11 +229,11 @@ class HBNBCommand(cmd.Cmd):
             if args not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage.all():
+            for k, v in storage.all(HBNBCommand.classes[args]).items():
                 if k.split('.')[0] == args:
                     print_list.append(str(v))
         else:
-            for k, v in storage.all():
+            for k, v in storage.all().items():
                 print_list.append(str(v))
 
         print(print_list)
