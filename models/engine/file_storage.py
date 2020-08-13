@@ -65,5 +65,6 @@ class FileStorage:
         """
         if obj:
             str_aux = "{}.{}".format(type(obj).__name__, obj.id)
-            if str_aux in self.all():
+            if str_aux in self.all().keys():
                 self.all().pop(str_aux)
+        self.save()
