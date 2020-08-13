@@ -8,20 +8,27 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 import models
 from os import getenv
+from models.user import User
+from models.state import State
+from models.city import City
+from models.place import Place
+from models.amenity import Amenity
+from models.review import Review
 
 
 class DBStorage:
     """ Database Engine for Air bnb clone """
     __engine = None
     __session = None
+
     def __init__(self):
         """ Init method """
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'
+        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
                                       .format(getenv('HBNB_MYSQL_USER'),
                                               getenv('HBNB_MYSQL_PWD'),
                                               getenv('HBNB_MYSQL_HOST'),
                                               getenv('HBNB_MYSQL_DB')),
-                                       pool_pre_ping=True)
+                                      pool_pre_ping=True)
         if getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(engine)
 
@@ -31,12 +38,12 @@ class DBStorage:
         if cls:
             objects = self.__session.query(cls).all()
         else:
-            objects = self.__session.query(models.State).all()
-            objects += self.__session.query(models.City).all()
-            objects += self.__session.query(models.User).all()
-            objects += self.__session.query(models.Place).all()
-            objects += self.__session.query(models.Amenity).all()
-            objects += self.__session.query(models.Review).all()
+            objects = self.__session.query(State).all()
+            objects += self.__session.query(City).all()
+            objects += self.__session.query(User).all()
+            objects += self.__session.query(Place).all()
+            objects += self.__session.query(Amenity).all()
+            objects += self.__session.query(Review).all()
         for obj in objects:
             key = "{}.{}".format(type(obj).__name__, obj.id)
             dic[key] = obj
@@ -66,6 +73,7 @@ class DBStorage:
         from models.review import Review
 
         Base.metadata.create_all(self.__engine)
-        self.__session = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        self.__session = sessionmaker(
+            bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(self.__session)
         self.__session = Session()
