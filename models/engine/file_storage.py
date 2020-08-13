@@ -10,7 +10,7 @@ class FileStorage:
 
     def all(self, cls=None):
         """Returns the list of objects of one type of class"""
-        if cls == None:
+        if cls is None:
             return FileStorage.__objects
         else:
             new_dic = {}
@@ -30,7 +30,6 @@ class FileStorage:
             temp.update(FileStorage.__objects)
             for key, val in temp.items():
                 temp[key] = val.to_dict()
-            print(temp)
             json.dump(temp, f)
 
     def reload(self):
@@ -61,7 +60,7 @@ class FileStorage:
         """Public instance method to delete obj from objects if it’s inside
 
         Args:
-            obj ([objet], optional): [object from BaseModel class] Defaults to None
+        obj ([objet], optional): [object from BaseModel class] Defaults to None
         """
         if obj:
             str_aux = "{}.{}".format(type(obj).__name__, obj.id)
