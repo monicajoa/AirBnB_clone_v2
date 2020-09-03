@@ -6,7 +6,7 @@
     /: display “Hello HBNB!”
     /hbnb: display “HBNB”
     /c/<text> display “C ” followed by the value of the text variable
-    /python/(<text>): display “Python ”, followed by the value of the text variable
+    /python/(<text>): show “Python”, followed by the value of the text variable
     using the option strict_slashes=False in your route definition
 """
 from flask import Flask
